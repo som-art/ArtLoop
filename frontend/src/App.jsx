@@ -1,4 +1,5 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Home, Login, Register } from "./pages";
 function Layout() {
   const user = null;
   const location = useLocation();

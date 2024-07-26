@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  display: none;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+}
+
+.topbar {
+  position: sticky;
+  top: 0px;
+  z-index: 49;
+}
+
+.dots-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  margin-right: 10px;
+  border-radius: 10px;
+  background-color: #fff;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.dot:last-child {
+  margin-right: 0;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.3s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.1s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    background-color: #b3d4fc;
+    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+  }
+
+  50% {
+    transform: scale(1.2);
+    background-color: #4b79e4;
+    box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+  }
+
+  100% {
+    transform: scale(0.8);
+    background-color: #2584f8;
+    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+  }
+}
+
+@layer base {
+  :root {
+    --color-bg: 230 230 250; /* Lavender background */
+    --color-primary: 75 0 130; /* Primary purple */
+    --color-secondary: 128 0 128; /* Secondary purple */
+    --color-ascent1: 186 85 211; /* Medium orchid */
+    --color-ascent2: 148 0 211; /* Dark violet */
+    --color-blue: 72 61 139; /* Dark slate blue */
+    --color-white: 255 255 255; /* White */
+  }
+  /* //15 23 42  21 30 49*/
+  [data-theme="dark"] {
+    --color-bg: 40 0 40; /* Dark purple background */
+    --color-primary: 60 0 100; /* Darker purple */
+    --color-secondary: 90 0 130; /* Dark purple */
+    --color-ascent1: 123 104 238; /* Medium slate blue */
+    --color-ascent2: 75 0 130; /* Indigo */
+    --color-blue: 58 0 90; /* Very dark purple */
+    --color-white: 255 255 255; /* White */
+  }
+}

@@ -79,67 +79,38 @@ export const followUnfollowUser = async (req, res) => {
 
 export const getSuggestedUsers = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming the user ID is available in the request
+    // Current user logged-in id
+    const userId = req.user._id;
 
-    // Get the list of users the current user is following
-    const currentUser = await User.findById(userId).select("following");
+    // List of users whom the currently logged-in user follows
+    const usersFollowedByMe = await User.findById(userId).select("following");
 
-    // Aggregate users based on mutual followers
+    // Fetch users that the current user is not following and have mutual followers
     const users = await User.aggregate([
       {
         $match: {
-          _id: { $ne: new mongoose.Types.ObjectId(userId) }, // Exclude the current user
+          _id: { $ne: userId }, // Exclude the current user
+          followers: { $in: usersFollowedByMe.following }, // Mutual followers
         },
       },
-      {
-        $lookup: {
-          from: "users", // Collection to join
-          localField: "followers",
-          foreignField: "_id",
-          as: "mutualFollowers",
-        },
-      },
-      {
-        $addFields: {
-          mutualCount: {
-            $size: {
-              $filter: {
-                input: "$mutualFollowers",
-                as: "follower",
-                cond: { $in: ["$$follower._id", currentUser.following] }, // Check for mutual followers
-              },
-            },
-          },
-        },
-      },
-      {
-        $match: {
-          mutualCount: { $gt: 0 }, // Only include users with mutual followers
-        },
-      },
-      {
-        $sort: { mutualCount: -1 }, // Sort by the number of mutual followers (descending)
-      },
-      {
-        $limit: 10, // Limit to 10 users
-      },
-      {
-        $project: {
-          password: 0, // Exclude the password field
-          mutualFollowers: 0, // Exclude the mutual followers list from the final result
-        },
-      },
+      { $sample: { size: 10 } }, // Select a random sample of 10 users
     ]);
 
-    // Exclude users that are already being followed by the current user
-    const suggestedUsers = users.filter(
-      (user) => !currentUser.following.includes(user._id)
+    // Exclude the users already followed by the current user
+    const filteredUsers = users.filter(
+      (user) => !usersFollowedByMe.following.includes(user._id)
     );
+
+    // Show only 4 users as suggestions
+    const suggestedUsers = filteredUsers.slice(0, 4);
+
+    // Remove the password field from the user objects
+    suggestedUsers.forEach((user) => (user.password = null));
 
     res.status(200).json(suggestedUsers);
   } catch (error) {
-    console.error("Error in getSuggestedUsers: ", error.message);
-    res.status(500).json({ error: error.message });
+    console.log("Error in suggestedUsers controller: ", error.message);
+    res.status(500).json({ error: "Internal server error!" });
   }
 };
 

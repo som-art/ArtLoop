@@ -51,7 +51,7 @@ const Post = ({ post }) => {
             {isMyPost && (
               <span className="flex justify-end flex-1">
                 <FaTrash
-                  className="cursor-pointer hover:text-red-500"
+                  className="cursor-pointer hover:text-red-600"
                   onClick={handleDeletePost}
                 />
               </span>
@@ -77,8 +77,8 @@ const Post = ({ post }) => {
                     .showModal()
                 }
               >
-                <FaRegComment className="w-4 h-4  text-slate-500 group-hover:text-sky-400" />
-                <span className="text-sm text-slate-500 group-hover:text-sky-400">
+                <FaRegComment className="w-4 h-4  text-slate-500 group-hover:text-purple-400" />
+                <span className="text-sm text-slate-500 group-hover:text-purple-400">
                   {post.comments.length}
                 </span>
               </div>

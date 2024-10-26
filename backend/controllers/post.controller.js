@@ -91,6 +91,15 @@ export const commentOnPost = async (req, res) => {
 
     //Push the userId and comment into the comments array
     post.comments.push(comment);
+
+    //Create new notification
+    const notification = new Notification({
+      from: userId,
+      to: post.user,
+      type: "comment",
+    });
+    await notification.save();
+
     //Save the changes to the database
     await post.save();
 

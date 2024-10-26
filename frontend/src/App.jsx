@@ -1,29 +1,21 @@
-import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Home, Login, Register } from "./pages";
-function Layout() {
-  const user = null;
-  const location = useLocation();
+import { Route, Routes } from "react-router-dom";
 
-  return user?.token ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" state={{ from: location }} replace />
-  );
-}
+import HomePage from "./pages/home/HomePage";
+import LoginPage from "./pages/auth/login/LoginPage";
+import SignUpPage from "./pages/auth/signup/SignUpPage";
+import Sidebar from "./components/common/Sidebar";
+import RightPanel from "./components/common/RightPannel";
+
 function App() {
   return (
-    <div className=" w-full min-h-[100vh] bg-bgColor">
+    <div className="flex mx-auto">
+      <Sidebar />
       <Routes>
-        {/* Protected Routes */}
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/profile/:id?" element={<Profile />} />
-        </Route>
-
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
+      <RightPanel />
     </div>
   );
 }

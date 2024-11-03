@@ -3,12 +3,13 @@ import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 
 import { useNavigate } from "react-router-dom";
 import { app } from "../firebase";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export default function OAuth() {
   const auth = getAuth(app);
 
+  const queryClient = useQueryClient();
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async () => {
       try {
@@ -40,6 +41,7 @@ export default function OAuth() {
     onSuccess: (data) => {
       //dispatch(signInSuccess(data));
       toast.success("Signed in successfully");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       // navigate("/"); // Uncomment if navigation is needed
     },
     onError: (error) => {

@@ -7,7 +7,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import OAuth from "../../../components/OAuth";
@@ -19,6 +19,8 @@ const SignUpPage = () => {
     fullName: "",
     password: "",
   });
+
+  const queryClient = useQueryClient();
 
   //useMutation is used when creating , updating or deleting data
   const { mutate, isError, isPending, error } = useMutation({
@@ -32,8 +34,7 @@ const SignUpPage = () => {
           body: JSON.stringify({ email, userName, fullName, password }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-        if (data.error) throw new Error(data.error);
+        if (!res.ok) throw new Error(data.error || "Failed to create account");
         console.log(data);
         return data;
       } catch (error) {
@@ -43,11 +44,7 @@ const SignUpPage = () => {
     },
     onSuccess: () => {
       toast.success("Account created successfully");
-
-      // {
-      //   /* Added this line below, after recording the video. I forgot to add this while recording, sorry, thx. */
-      // }
-      // queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 

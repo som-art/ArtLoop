@@ -140,12 +140,27 @@ export const google = async (req, res) => {
       name.toLowerCase().split(" ").join("") +
       Math.random().toString(36).slice(-4);
 
-    //Upload picture in cloudinary
+    console.log(googlePhotoUrl);
+
+    //Upload picture in
     if (googlePhotoUrl) {
-      //upload image in cloudinary
-      const uploadedResponse = await cloudinary.uploader.upload(googlePhotoUrl);
-      //store the modified url to update in database
-      googlePhotoUrl = uploadedResponse.secure_url;
+      try {
+        // Upload image to Cloudinary and check the response
+        const uploadedResponse = await cloudinary.uploader.upload(
+          googlePhotoUrl
+        );
+
+        if (!uploadedResponse || !uploadedResponse.secure_url) {
+          console.error("Cloudinary upload failed or returned an empty URL");
+          googlePhotoUrl = ""; // Optionally set a default or handle this case
+        } else {
+          // Store the modified Cloudinary URL to update in database
+          googlePhotoUrl = uploadedResponse.secure_url;
+        }
+      } catch (uploadError) {
+        console.error("Error during Cloudinary upload:", uploadError);
+        googlePhotoUrl = ""; // Optionally handle upload errors here
+      }
     }
 
     // Create new user
@@ -154,7 +169,7 @@ export const google = async (req, res) => {
       fullName: name,
       email,
       password: hashedPassword,
-      profilePicture: googlePhotoUrl,
+      profileImg: googlePhotoUrl,
     });
 
     // Save new user in the database

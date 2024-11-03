@@ -7,7 +7,7 @@ export const getNotifications = async (req, res) => {
     const notifications = await Notification.find({ to: userId }).populate({
       path: "from",
       //Select just the username and profile img of the from field to display
-      select: "username profileImg",
+      select: "userName profileImg",
     });
 
     //After opening the notification mark the new ones as read

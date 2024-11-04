@@ -4,7 +4,7 @@ import { IoCloseSharp } from "react-icons/io5";
 const EditProfileModal = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    username: "",
+    userName: "",
     email: "",
     bio: "",
     link: "",
@@ -55,7 +55,7 @@ const EditProfileModal = () => {
                 type="text"
                 placeholder="Username"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                value={formData.username}
+                value={formData.userName}
                 name="username"
                 onChange={handleInputChange}
               />

@@ -78,7 +78,7 @@ const LoginPage = () => {
               placeholder="Email / username"
               name="userNameOrEmail"
               onChange={handleInputChange}
-              value={formData.username}
+              value={formData.userNameOrEmail}
             />
           </label>
 

@@ -56,7 +56,7 @@ const EditProfileModal = () => {
                 placeholder="Username"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
                 value={formData.userName}
-                name="username"
+                name="userName"
                 onChange={handleInputChange}
               />
             </div>

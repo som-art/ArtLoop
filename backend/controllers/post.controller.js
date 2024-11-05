@@ -117,33 +117,27 @@ export const likeUnlikePost = async (req, res) => {
 
     const post = await Post.findById(postId);
 
-    //Check if post exists in database
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    //Check if user is included
     const userLikedPost = post.likes.includes(userId);
 
     if (userLikedPost) {
-      //If liked arrays include userId unlike the post
-
-      //Remove the userId from the likes array
+      // Unlike post
       await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
-      //Update the likedPost array in user details
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
-      res.status(200).json({ message: "Post unliked successfully" });
-    } else {
-      //If liked array doesnot include userId
 
-      //Add userId to liked array
+      const updatedLikes = post.likes.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+      res.status(200).json(updatedLikes);
+    } else {
+      // Like post
       post.likes.push(userId);
-      //Add postId to the likedPosts array of the user
       await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
-      //Save it to database
       await post.save();
 
-      //Create new notification
       const notification = new Notification({
         from: userId,
         to: post.user,
@@ -151,10 +145,11 @@ export const likeUnlikePost = async (req, res) => {
       });
       await notification.save();
 
-      res.status(200).json({ message: "Post liked successfully" });
+      const updatedLikes = post.likes;
+      res.status(200).json(updatedLikes);
     }
   } catch (error) {
-    console.log("Error in likeUnlikePost controller", error);
+    console.log("Error in likeUnlikePost controller: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -4,11 +4,14 @@ export const getNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
     //Find the notifications send to that user by matching the userId to the 'to' field
-    const notifications = await Notification.find({ to: userId }).populate({
-      path: "from",
-      //Select just the username and profile img of the from field to display
-      select: "userName profileImg",
-    });
+    // Find the notifications sent to that user, sorting by latest first
+    const notifications = await Notification.find({ to: userId })
+      .populate({
+        path: "from",
+        // Select only the username and profile image fields to display
+        select: "userName profileImg",
+      })
+      .sort({ createdAt: -1 }); // Sort by createdAt in descending order
 
     //After opening the notification mark the new ones as read
     await Notification.updateMany({ to: userId }, { read: true });

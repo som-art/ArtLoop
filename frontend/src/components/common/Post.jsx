@@ -17,7 +17,7 @@ const Post = ({ post }) => {
   const queryClient = useQueryClient();
 
   const postOwner = post.user;
-  console.log(post.likes);
+
   const isLiked = post.likes.includes(authUser._id);
   const isMyPost = post.user._id === authUser._id;
   const isFollowing = authUser.following.includes(postOwner._id); // Check if already following
@@ -61,21 +61,23 @@ const Post = ({ post }) => {
       }
     },
     onSuccess: (updatedLikes) => {
-      // this is not the best UX, bc it will refetch all posts
-      // queryClient.invalidateQueries({ queryKey: ["posts"] });
+      // Update the likes in cache for the specific post, without refetching all posts
+      Promise.all([
+        queryClient.setQueryData(["posts"], (oldData) => {
+          return oldData.map((p) => {
+            if (p._id === post._id) {
+              return { ...p, likes: updatedLikes }; // Update likes only for this post
+            }
+            return p; // Leave other posts unchanged
+          });
+        }),
 
-      // instead, update the cache directly for that post
-      queryClient.setQueryData(["posts"], (oldData) => {
-        return oldData.map((p) => {
-          if (p._id === post._id) {
-            return { ...p, likes: updatedLikes };
-          }
-          return p;
-        });
-      });
+        // Invalidate notifications to fetch the latest unread notifications for the user
+        queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+      ]);
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message); // Show error if like/unlike fails
     },
   });
 
@@ -102,7 +104,10 @@ const Post = ({ post }) => {
     onSuccess: () => {
       toast.success("Comment posted successfully");
       setComment("");
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["posts"] }),
+        queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+      ]);
     },
     onError: (error) => {
       toast.error(error.message);

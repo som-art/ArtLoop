@@ -1,5 +1,5 @@
 import LogoSvg from "../svgs/logo";
-
+import { useEffect } from "react";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -11,6 +11,23 @@ import toast from "react-hot-toast";
 
 const Sidebar = () => {
   const queryClient = useQueryClient();
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  // Fetch notifications and filter for unread notifications for authUser
+  const { data: notifications } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      return data;
+    },
+  });
+
+  // Check if there are unread notifications for authUser
+  const hasUnreadNotifications = notifications?.some(
+    (notification) => notification.to === authUser?._id && !notification.read
+  );
+
   const {
     mutate: logout,
     isPending,
@@ -40,8 +57,6 @@ const Sidebar = () => {
     },
   });
 
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
   console.log(authUser);
 
   return (
@@ -63,10 +78,13 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="relative flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <IoNotifications className="w-6 h-6" />
               <span className="text-lg hidden md:block">Notifications</span>
+              {hasUnreadNotifications && (
+                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-600 rounded-full" />
+              )}
             </Link>
           </li>
 

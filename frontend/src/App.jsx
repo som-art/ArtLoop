@@ -51,7 +51,7 @@ function App() {
   }
 
   return (
-    <div className="flex mx-auto">
+    <div className="flex mx-auto max-w-full">
       {authUser && <Sidebar />}
       <Routes>
         <Route

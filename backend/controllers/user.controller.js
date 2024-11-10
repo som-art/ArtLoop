@@ -9,10 +9,15 @@ import mongoose from "mongoose";
 export const getUserProfile = async (req, res) => {
   const { userName } = req.params;
   try {
-    const user = await User.findOne({ userName }).select("-password");
+    const user = await User.findOne({ userName })
+      .select("-password") // Exclude the password field from the main user
+      .populate("followers", "-password") // Populate followers and exclude passwords
+      .populate("following", "-password"); // Populate following and exclude passwords
+
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
+
     res.status(200).json(user);
   } catch (error) {
     console.log("Error in getUserProfile: ", error.message);

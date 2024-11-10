@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { IoCloseSharp } from "react-icons/io5";
+import { useEffect, useState } from "react";
+import useUpdateUserProfile from "../../hooks/useUpdateProfile";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ authUser }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     userName: "",
@@ -12,9 +12,25 @@ const EditProfileModal = () => {
     currentPassword: "",
   });
 
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile();
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        userName: authUser.userName,
+        email: authUser.email,
+        bio: authUser.bio,
+        link: authUser.link,
+        newPassword: "",
+        currentPassword: "",
+      });
+    }
+  }, [authUser]);
 
   return (
     <>
@@ -28,18 +44,12 @@ const EditProfileModal = () => {
       </button>
       <dialog id="edit_profile_modal" className="modal">
         <div className="modal-box border rounded-md border-gray-700 shadow-md">
-          <IoCloseSharp
-            className="absolute top-2 right-2 text-white bg-gray-800 rounded-full w-6 h-6 cursor-pointer"
-            onClick={() =>
-              document.getElementById("edit_profile_modal").close()
-            }
-          />
           <h3 className="font-bold text-lg my-3">Update Profile</h3>
           <form
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert("Profile updated successfully");
+              updateProfile(formData);
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -104,7 +114,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+              {isUpdatingProfile ? "Updating..." : "Update"}
             </button>
           </form>
         </div>

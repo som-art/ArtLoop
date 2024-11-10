@@ -15,12 +15,15 @@ import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
 
 import useFollow from "../../hooks/useFollow";
-//import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
+import useUpdateUserProfile from "../../hooks/useUpdateProfile";
+import FollowersFollowingModal from "./FollowersFollowingModal";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
   const [feedType, setFeedType] = useState("posts");
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
 
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
@@ -55,7 +58,14 @@ const ProfilePage = () => {
     },
   });
 
-  //const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
+  const handleShowFollowers = () => setShowFollowers(true);
+  const handleShowFollowing = () => setShowFollowing(true);
+  const handleCloseModal = () => {
+    setShowFollowers(false);
+    setShowFollowing(false);
+  };
+
+  const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
 
   const isMyProfile = authUser._id === user?._id;
   const memberSinceDate = formatMemberSinceDate(user?.createdAt);
@@ -102,7 +112,7 @@ const ProfilePage = () => {
               {/* COVER IMG */}
               <div className="relative group/cover">
                 <img
-                  src={coverImg || user?.coverImg || "/cover.png"}
+                  src={coverImg || user?.coverImg || "/cover.jpg"}
                   className="h-52 w-full object-cover"
                   alt="cover image"
                 />
@@ -209,19 +219,27 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <div className="flex gap-1 items-center">
-                    <span className="font-bold text-xs">
-                      {user?.following.length}
-                    </span>
-                    <span className="text-slate-500 text-xs">Following</span>
+                  <div onClick={handleShowFollowing} className="cursor-pointer">
+                    {user?.following.length} Following
                   </div>
-                  <div className="flex gap-1 items-center">
-                    <span className="font-bold text-xs">
-                      {user?.followers.length}
-                    </span>
-                    <span className="text-slate-500 text-xs">Followers</span>
+                  <div onClick={handleShowFollowers} className="cursor-pointer">
+                    {user?.followers.length} Followers
                   </div>
                 </div>
+
+                {/* Followers and Following Modals */}
+                <FollowersFollowingModal
+                  isOpen={showFollowers}
+                  onClose={handleCloseModal}
+                  users={user?.followers || []}
+                  title="Followers"
+                />
+                <FollowersFollowingModal
+                  isOpen={showFollowing}
+                  onClose={handleCloseModal}
+                  users={user?.following || []}
+                  title="Following"
+                />
               </div>
               <div className="flex w-full border-b border-gray-700 mt-4">
                 <div

@@ -53,28 +53,40 @@ function App() {
   return (
     <div className="flex mx-auto max-w-full">
       {authUser && <Sidebar />}
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/notifications"
-          element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/profile/:userName"
-          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-        />
-      </Routes>
+      {/* Main Content with Background Image and Overlay */}
+      <div className="flex-1 relative bg-custom-pattern bg-cover bg-center overflow-y-auto">
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black opacity-85 z-0"></div>
+
+        {/* Routes and Content */}
+        <div className="relative z-10 p-4">
+          <Routes>
+            <Route
+              path="/"
+              element={authUser ? <HomePage /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/login"
+              element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/signup"
+              element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/notifications"
+              element={
+                authUser ? <NotificationPage /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/profile/:userName"
+              element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+            />
+          </Routes>
+        </div>
+      </div>
+
       {authUser && <RightPanel />}
       <Toaster />
     </div>
